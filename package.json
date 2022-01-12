@@ -11,5 +11,9 @@
   "license": "ISC",
   "devDependencies": {
     "@vercel/node": "^1.12.1"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "crypto-js": "^4.1.1"
   }
 }
