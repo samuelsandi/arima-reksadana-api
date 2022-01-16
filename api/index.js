@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
     for(var i = 0; i < pred.length; i++) {
       var nextDate = new Date(lastDate);
       nextDate.setDate(lastDate.getDate() + 1);
-      predictionAndDates.push({price:prices[i], date:nextDate.toISOString().slice(0,10)})
+      predictionAndDates.push({price:pred[i], date:nextDate.toISOString().slice(0,10)})
       lastDate = nextDate
     }
 
