@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
 
     for(var i = 0; i < data.chart.length; i++) {
       prices.push(data.chart[i].value)
-      pricesAndDates.push({value:data.chart[i].value, date:data.chart[i].formated_date})
+      pricesAndDates.push({price:data.chart[i].value, date:data.chart[i].formated_date})
       if (i==data.chart.length-1){
         lastDate = new Date(data.chart[i].formated_date)
       }
@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
     for(var i = 0; i < pred.length; i++) {
       var nextDate = new Date(lastDate);
       nextDate.setDate(lastDate.getDate() + 1);
-      predictionAndDates.push({value:prices[i], date:nextDate.toISOString().slice(0,10)})
+      predictionAndDates.push({price:prices[i], date:nextDate.toISOString().slice(0,10)})
       lastDate = nextDate
     }
 
