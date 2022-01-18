@@ -4,7 +4,8 @@ const ARIMA = require('arima')
 
 module.exports = async (req, res) => {
   try {
-    const data = await getData(req.query)
+    const data = await getData(req.query.rd)
+    console.log(req.query.rd)
     
     var prices = []
     var pricesAndDates = []
@@ -35,7 +36,7 @@ module.exports = async (req, res) => {
       lastDate = nextDate
     }
 
-    return res.json({pric:pricesAndDates,pred:predictionAndDates})
+    return res.json({pastPrices:pricesAndDates,predictionPrices:predictionAndDates})
   } catch (error) {
     const status = error.name === 'ValidationError' ? 422 : 500
 
@@ -43,12 +44,13 @@ module.exports = async (req, res) => {
   }
 }
 
-const getData = async (params = {}) => {
-
+// const getData = async (params = {}) => {
+async function getData(rdCode) {
   try {
+    params = {}
     const response = await axios.request({
       method: 'GET',
-      url: 'https://api.bibit.id/products/RD13/chart?period=1M',
+      url: 'https://api.bibit.id/products/'+rdCode+'/chart?period=1M',
       headers: {
         Accept: 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip, deflate, br',
