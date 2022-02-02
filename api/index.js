@@ -1,22 +1,22 @@
-const axios = require('axios')
-const CryptoJS = require('crypto-js')
 const ARIMA = require('arima')
+const PR = require('./PriceRequester.js')
 
 module.exports = async (req, res) => {
   try {
-    const data = await getData(req.query.rd)
-    console.log(req.query.rd)
+    const pr = new PR(req.query.rd)
+    const decryptedPrices = await pr.getData()
     
+
     var prices = []
     var pricesAndDates = []
     var predictionAndDates = []
     var lastDate
 
-    for(var i = 0; i < data.chart.length; i++) {
-      prices.push(data.chart[i].value)
-      pricesAndDates.push({price:data.chart[i].value, date:data.chart[i].formated_date})
-      if (i==data.chart.length-1){
-        lastDate = new Date(data.chart[i].formated_date)
+    for(var i = 0; i < decryptedPrices.chart.length; i++) {
+      prices.push(decryptedPrices.chart[i].value)
+      pricesAndDates.push({price:decryptedPrices.chart[i].value, date:decryptedPrices.chart[i].formated_date})
+      if (i==decryptedPrices.chart.length-1){
+        lastDate = new Date(decryptedPrices.chart[i].formated_date)
       }
     }
     
@@ -30,8 +30,8 @@ module.exports = async (req, res) => {
     const [pred,errors] = arima.predict(5)
 
     for(var i = 0; i < pred.length; i++) {
-      var nextDate = new Date(lastDate);
-      nextDate.setDate(lastDate.getDate() + 1);
+      var nextDate = new Date(lastDate)
+      nextDate.setDate(lastDate.getDate() + 1)
       predictionAndDates.push({price:pred[i], date:nextDate.toISOString().slice(0,10)})
       lastDate = nextDate
     }
@@ -42,44 +42,4 @@ module.exports = async (req, res) => {
 
     return res.status(status).json({ error: error.message })
   }
-}
-
-// const getData = async (params = {}) => {
-async function getData(rdCode) {
-  try {
-    params = {}
-    const response = await axios.request({
-      method: 'GET',
-      url: 'https://api.bibit.id/products/'+rdCode+'/chart?period=1M',
-      headers: {
-        Accept: 'application/json, text/plain, */*',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'en-US,en;q=0.9',
-        Origin: 'https://app.bibit.id',
-        Referer: 'https://app.bibit.id/',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0',
-      },
-      params: params,
-    })
-
-    return decryptData(response.data.data)
-  } catch (error) {
-    const message = error.response ? error.response.data.message : error.message
-
-    throw new Error(message)
-  }
-};
-
-const decryptData = data => {
-  const iv = CryptoJS.enc.Hex.parse(data.slice(0, 32))
-  const encryptedData = data.slice(32, -32)
-  const secret = CryptoJS.enc.Utf8.parse(data.slice(-32))
-
-  const bytes = CryptoJS.AES.decrypt(encryptedData, secret, {
-    iv,
-    mode: CryptoJS.mode.CBC,
-    format: CryptoJS.format.Hex,
-  });
-
-  return JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
 }
