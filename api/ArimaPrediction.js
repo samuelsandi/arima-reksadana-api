@@ -1,11 +1,6 @@
 const ARIMA = require('arima')
 
-class ArimaModel {
-
-    constructor(){
-
-    }
-
+class ArimaPrediction {
     predict(pastPrices){
         const arima = new ARIMA({
             p:2,
@@ -20,4 +15,4 @@ class ArimaModel {
     }
 }
 
-module.exports = ArimaModel
+module.exports = ArimaPrediction

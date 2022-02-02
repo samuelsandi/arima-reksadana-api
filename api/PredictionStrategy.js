@@ -1,4 +1,4 @@
-class PredictionModel {
+class PredictionStrategy {
 
     constructor(){
         this._model = null
@@ -14,10 +14,10 @@ class PredictionModel {
 
     predict(bibitPrices){
 
+        var lastDate
         var prices = []
         var pricesAndDates = []
         var predictionAndDates = []
-        var lastDate
 
         for(var i = 0; i < bibitPrices.chart.length; i++) {
             prices.push(bibitPrices.chart[i].value)
@@ -38,8 +38,8 @@ class PredictionModel {
             lastDate = nextDate
         }
 
-        return {pstprices:pricesAndDates, predictionPrices:predictionAndDates}
+        return {pastPrices:pricesAndDates, predictionPrices:predictionAndDates}
     }
 }
 
-module.exports = PredictionModel
+module.exports = PredictionStrategy
