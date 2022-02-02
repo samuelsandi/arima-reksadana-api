@@ -1,42 +1,18 @@
-const ARIMA = require('arima')
-const PR = require('./PriceRequester.js')
+const priceRequester = require('./PriceRequester.js')
+const predictionModel = require('./PredictionModel.js')
+const arimaModel = require('./ArimaModel.js')
 
 module.exports = async (req, res) => {
   try {
-    const pr = new PR(req.query.rd)
-    const decryptedPrices = await pr.getData()
-    
+    const pr = new priceRequester(req.query.rd)
+    const bibitPrices = await pr.getPrices()
 
-    var prices = []
-    var pricesAndDates = []
-    var predictionAndDates = []
-    var lastDate
+    const pm = new predictionModel()
+    pm.model = new arimaModel()
 
-    for(var i = 0; i < decryptedPrices.chart.length; i++) {
-      prices.push(decryptedPrices.chart[i].value)
-      pricesAndDates.push({price:decryptedPrices.chart[i].value, date:decryptedPrices.chart[i].formated_date})
-      if (i==decryptedPrices.chart.length-1){
-        lastDate = new Date(decryptedPrices.chart[i].formated_date)
-      }
-    }
-    
-    const arima = new ARIMA({
-      p:2,
-      d:1,
-      q:2,
-      verbose: false
-    }).train(prices)
+    retVal = pm.predict(bibitPrices)
 
-    const [pred,errors] = arima.predict(5)
-
-    for(var i = 0; i < pred.length; i++) {
-      var nextDate = new Date(lastDate)
-      nextDate.setDate(lastDate.getDate() + 1)
-      predictionAndDates.push({price:pred[i], date:nextDate.toISOString().slice(0,10)})
-      lastDate = nextDate
-    }
-
-    return res.json({pastPrices:pricesAndDates,predictionPrices:predictionAndDates})
+    return res.json(retVal)
   } catch (error) {
     const status = error.name === 'ValidationError' ? 422 : 500
 

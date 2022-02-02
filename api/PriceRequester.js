@@ -4,7 +4,11 @@ const axios = require('axios')
 class PriceRequester {
 
     constructor(rdCode){
-        this.code = rdCode
+        if (typeof rdCode !== "undefined"){
+            this.code = rdCode
+        } else {
+            this.code = "RD68"
+        }
     }
 
     decryptPrices(responsePrices) {
@@ -21,11 +25,7 @@ class PriceRequester {
         return JSON.parse(decryptedPrices)
     }
     
-    async getData() {
-
-        if (this.code.length == 0){
-          code = "RD68"
-        }
+    async getPrices() {
         try {
           const response = await axios.request({
             method: 'GET',
@@ -42,8 +42,8 @@ class PriceRequester {
           })
           return this.decryptPrices(response.data.data)
         } catch (error) {
-          const message = error.response ? error.response.data.message : error.message
-          throw new Error(message)
+            const message = error.response ? error.response.data.message : error.message
+            throw new Error(message)
         }
     }
 }
