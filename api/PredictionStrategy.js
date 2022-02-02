@@ -14,25 +14,26 @@ class PredictionStrategy {
 
     predict(bibitPrices){
 
+        let i;
         var lastDate
         var prices = []
         var pricesAndDates = []
         var predictionAndDates = []
 
-        for(var i = 0; i < bibitPrices.chart.length; i++) {
+        for(i = 0; i < bibitPrices.chart.length; i++) {
             prices.push(bibitPrices.chart[i].value)
             pricesAndDates.push({
                 price:bibitPrices.chart[i].value, 
                 date:bibitPrices.chart[i].formated_date})
-            if (i==bibitPrices.chart.length-1){
+            if (i===bibitPrices.chart.length-1){
                 lastDate = new Date(bibitPrices.chart[i].formated_date)
                 }
         }
         
         const pred = this._model.predict(prices)
 
-        for(var i = 0; i < pred.length; i++) {
-            var nextDate = new Date(lastDate)
+        for(i = 0; i < pred.length; i++) {
+            const nextDate = new Date(lastDate);
             nextDate.setDate(lastDate.getDate() + 1)
             predictionAndDates.push({price:pred[i], date:nextDate.toISOString().slice(0,10)})
             lastDate = nextDate
