@@ -12,7 +12,7 @@ class PredictionStrategy {
         return this._model
     }
 
-    predict(bibitPrices){
+    predict(bibitPrices, days){
 
         let i;
         var lastDate
@@ -30,7 +30,7 @@ class PredictionStrategy {
                 }
         }
         
-        const pred = this._model.predict(prices)
+        const pred = this._model.predict(prices, days)
 
         for(i = 0; i < pred.length; i++) {
             const nextDate = new Date(lastDate);

@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     // Calculate Prediction Values
     const pm = new predictionStrategy()
     pm.model = new arimaPrediction()
-    retVal = pm.predict(bibitPrices)
+    retVal = pm.predict(bibitPrices, req.query.days)
 
     return res.json(retVal)
     

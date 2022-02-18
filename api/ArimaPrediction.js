@@ -1,7 +1,7 @@
 const ARIMA = require('arima')
 
 class ArimaPrediction {
-    predict(pastPrices){
+    predict(pastPrices, days){
         const arima = new ARIMA({
             p:2,
             d:1,
@@ -9,7 +9,7 @@ class ArimaPrediction {
             verbose: false
         }).train(pastPrices)
 
-        const [prediction] = arima.predict(5)
+        const [prediction] = arima.predict(days)
 
         return prediction
     }
